@@ -1,0 +1,96 @@
+version: '3.8'
+
+name: libreconnect
+networks:
+  libreconnect:
+    driver: bridge
+    name: libreconnect
+
+services:
+  nats:
+    image: nats:latest
+    container_name: nats-libreconnect
+    command: -n internal-server -m 8222 -js
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+    networks:
+      - libreconnect
+  nats-dashboard:
+    image: mdawar/nats-dashboard
+    environment:
+      REVERSE_PROXY_UPSTREAM: 'nats:8222'
+    # volumes:
+    #   - ./config.json:/srv/config.json
+    ports:
+      - target: 80
+        published: 8000
+        protocol: tcp
+  postgres:
+    image: postgres:16.3
+    container_name: postgres-libreconnect
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - libreconnect
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: "postgres"  # Remplacez par l'adresse IP ou le nom du serveur de votre instance PostgreSQL
+      DB_PORT: "5432"  # Port par défaut de PostgreSQL
+      DB_DATABASE: "keycloak"
+      DB_USER: "postgres"
+      DB_PASSWORD: "postgres"
+    command:
+      - start-dev
+    volumes:
+      - keycloak_data:/path/to/keycloak/data
+    networks:
+      - libreconnect
+  redis:
+    image: bitnami/redis:latest
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=password
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_volume:/var/lib/redis/data
+    networks:
+      - libreconnect
+  minio:
+    image: minio/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: password
+    volumes:
+      - 'minio:/data/minio'
+    command: 'minio server /data/minio --console-address ":9001"'
+    networks:
+      - libreconnect
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j-libreconnect
+    ports:
+      - 7474:7474
+      - 7687:7687
+    environment:
+      NEO4J_AUTH: neo4j/password
+    networks:
+      - libreconnect
+volumes:
+  keycloak_data: {}
+  redis_volume: {}
+  minio: {}
