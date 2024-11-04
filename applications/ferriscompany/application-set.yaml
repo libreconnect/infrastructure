@@ -10,10 +10,10 @@ spec:
         elements:
           - environment: dev
             namespace: libreconnect
-            valuesFile: ../environments/dev/values.yaml
+            valuesFile: environments/dev/values.yaml
           - environment: prod
             namespace: libreconnect
-            valuesFile: ../environments/prod/values.yaml
+            valuesFile: environments/prod/values.yaml
   template:
     metadata:
       name: '{{ environment }}-ferriscompany'
