@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ferriscompany-app
+  namespace: argocd
+
+spec:
+  generators:
+    - list:
+        elements:
+          - environment: dev
+            namespace: libreconnect
+            valuesFile: ../environments/dev/values.yaml
+          - environment: prod
+            namespace: libreconnect
+            valuesFile: ../environments/prod/values.yaml
+  template:
+    metadata:
+      name: '{{ environment }}-ferriscompany'
+      labels:
+        app.kubernetes.io/name: ferriscompany
+        app.kubernetes.io/instance: '{{ environment }}-ferriscompany'
+        app.kubernetes.io/managed-by: argocd
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/libreconnect/infrastructure.git'
+        targetRevision: HEAD
+        path: applications/ferriscompany/chart
+        helm:
+          valueFiles:
+            - '{{ valuesFile }}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: '{{ namespace }}'
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        retry:
+          limit: 3
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 2m

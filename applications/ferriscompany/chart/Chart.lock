@@ -1,0 +1,6 @@
+dependencies:
+- name: ferriscompany
+  repository: https://libreconnect.github.io/ferriscompany/kubernetes/chart/charts/
+  version: 0.1.0
+digest: sha256:6ac3c39842a7c41ac0d07f54b09feb69b0a903d080c76fd8d18e53d17abbeb77
+generated: "2024-11-04T04:56:18.489478+01:00"
