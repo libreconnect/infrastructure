@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: libreconnect
+  namespace: argocd
+spec:
+  sourceRepos:
+    - '*'
+    - 'https://github.com/libreconnect/infrastructure.git'
+  destinations:
+    - server: 'https://kubernetes.default.svc'
+      namespace: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  roles:
+    - name: admin
+      policies:
+        - p, proj:libreconnect:admin, applications, *, libreconnect/*, allow
+      groups:
+        - admin

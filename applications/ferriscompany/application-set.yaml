@@ -22,7 +22,7 @@ spec:
         app.kubernetes.io/instance: '{{ environment }}-ferriscompany'
         app.kubernetes.io/managed-by: argocd
     spec:
-      project: default
+      project: libreconnect
       source:
         repoURL: 'https://github.com/libreconnect/infrastructure.git'
         targetRevision: HEAD
