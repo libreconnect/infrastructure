@@ -3,7 +3,7 @@ name: Check Service (fmt, clippy)
 on:
   workflow_call:
     inputs:
-      tag:
+      ref:
         type: string
         required: true
       repository:
@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.ref }}
           repository: ${{ inputs.repository }}
           token: ${{ secrets.PAT }}
           fetch-depth: 0
@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ inputs.ref }}
           repository: ${{ inputs.repository }}
           token: ${{ secrets.PAT }}
           fetch-depth: 0
