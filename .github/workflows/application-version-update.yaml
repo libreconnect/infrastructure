@@ -1,0 +1,58 @@
+name: Application version update
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+      repository:
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      environment:
+        type: string
+        required: true
+      path:
+        type: string
+        required: true
+      key:
+        type: string
+        required: true
+    secrets:
+      PAT:
+        required: true
+
+jobs:
+  update-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.PAT }}
+      - name: Update deployment.yaml
+        env:
+          VERSION: ${{ inputs.version }} 
+          PATH: ${{ inputs.path }}
+          ENV: ${{ inputs.environment }}
+          KEY: ${{ inputs.key }}
+        run: |
+          echo "Déploiement de la version $VERSION sur l'environnement $ENV"
+          yq -ie "$KEY = \"$VERSION\"" $PATH
+      - name: Commit changes          
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add $PATH
+          git commit -m "Deploying the $VERSION version on the $ENV environment"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          VERSION: ${{ inputs.version }} 
+          ENV: ${{ inputs.environment }}
+          PATH: ${{ inputs.path }}
