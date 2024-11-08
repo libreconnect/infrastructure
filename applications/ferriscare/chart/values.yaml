@@ -1,24 +1,6 @@
-# Default values for infra.
+# Default values for chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
-
-neo4j:
-  nameOverride: "neo4j"
-  neo4j:
-    name: neo4j
-    user: "neo4j"
-    password: "nathaelbonnal"
-    resources:
-      cpu: "0.5"
-      memory: "2Gi"
-  volumes:
-    data:
-      mode: defaultStorageClass
-      defaultStorageClass:
-        requests:
-          storage: 2Gi
-
 
 replicaCount: 1
 

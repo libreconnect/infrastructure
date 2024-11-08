@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ferriscare-app
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - environment: dev
+            namespace: libreconnect
+            valuesFile: environments/dev/values.yaml
+          - environment: prod
+            namespace: libreconnect
+            valuesFile: environments/prod/values.yaml
+          - environment: staging
+            namespace: libreconnect
+            valuesFile: environments/staging/values.yaml
