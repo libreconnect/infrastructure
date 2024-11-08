@@ -35,6 +35,10 @@ jobs:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.ref }}
           token: ${{ secrets.PAT }}
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
       - name: Update deployment.yaml
         env:
           VERSION: ${{ inputs.version }} 
@@ -43,7 +47,7 @@ jobs:
           KEY: ${{ inputs.key }}
         run: |
           echo "Déploiement de la version $VERSION sur l'environnement $ENV"
-          yq -ie "$KEY = \"$VERSION\"" $PATH
+          yq -ie '.ferriscompany.image.tag = "$VERSION"' $PATH
       - name: Commit changes          
         run: |
           git config user.name "GitHub Actions"
