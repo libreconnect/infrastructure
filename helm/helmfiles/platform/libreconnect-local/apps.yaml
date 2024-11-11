@@ -1,0 +1,22 @@
+ferriscompany:
+  image:  
+    tag: 0.1.0-rc6
+  
+  nats:
+    url: "infrastructure-nats:4222"
+  database:
+    url: "infrastructure-neo4j:7687"
+    secretName: "neo4j-credentials"
+    key_password: 'neo4j-password'
+    key_username: 'neo4j-user'
+  ingress:
+    enabled: true
+    annotations: {
+      "traefik.ingress.kubernetes.io/redirect-entry-point": "web",
+    }
+
+    hosts:
+      - host: api.local.libreconnect.com
+        paths:
+          - path: /v1/companies
+            pathType: Prefix
