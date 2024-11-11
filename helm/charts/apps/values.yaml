@@ -1,0 +1,7 @@
+ferriscompany:
+  image:
+    tag: 0.1.2-rc7
+  database:
+    url: "infrastructure-neo4j:7687"
+  nats:
+    url: "infrastructure-nats:4222"

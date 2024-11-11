@@ -1,0 +1,15 @@
+dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 15.4.2
+- name: neo4j
+  repository: https://helm.neo4j.com/neo4j
+  version: 5.24.1
+- name: nats
+  repository: https://nats-io.github.io/k8s/helm/charts
+  version: 1.2.6
+- name: keycloak
+  repository: https://charts.bitnami.com/bitnami
+  version: 24.0.4
+digest: sha256:ec94a96a584f494a47bf402ade5754a85fb4c695e94f26175aafd8f59a456a51
+generated: "2024-11-04T15:00:21.36771+01:00"

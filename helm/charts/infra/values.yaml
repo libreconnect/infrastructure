@@ -1,0 +1,43 @@
+# Default values for infra.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+neo4j:
+  nameOverride: "neo4j"
+  neo4j:
+    name: neo4j
+    user: "neo4j"
+    password: "nathaelbonnal"
+    resources:
+      cpu: "0.5"
+      memory: "2Gi"
+  volumes:
+    data:
+      mode: defaultStorageClass
+      defaultStorageClass:
+        requests:
+          storage: 2Gi
+  
+postgresql:
+  architecture: replication
+  auth: 
+    existingSecret: "postgres-creds"
+    secretKeys:
+      adminPasswordKey: "password"
+      userPasswordKey: "username" 
+
+keycloak:
+  proxy: edge
+  auth:
+    adminUser: "admin"
+    adminPassword: 6ufs894a
+  externalDatabase:
+    existingSecret: "postgres-creds"
+    existingSecretPasswordKey: "password"
+    existingSecretUserKey: "username"
+    host: "infrastructure-postgresql-primary"
+    database: "keycloak"
+  postgresql:
+    enabled: false
+

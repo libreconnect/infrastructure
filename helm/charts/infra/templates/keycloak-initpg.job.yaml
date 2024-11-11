@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-{{ .Release.Revision }}-keycloak-initpg-job"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-weight": "-80"
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      initContainers:
+      - name: "{{ .Release.Name }}-check-postgresql-keycloak-initpg-job"
+        image: postgres:15.8-alpine3.20
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -U $DB_USER -h {{ .Release.Name }}-postgresql-primary;
+          do
+            echo "Waiting for PostgreSQL to be ready...";
+            sleep 2;
+          done;
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.keycloak.externalDatabase.existingSecret }}
+              key: {{ .Values.keycloak.externalDatabase.existingSecretUserKey }}
+      containers:
+      - name: "{{ .Release.Name }}-keycloak-initpg-job"
+        image: "postgres:15.8-alpine3.20"
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - |
+            # Database parameters
+            DB_HOST="{{ .Release.Name }}-postgresql-primary"
+            # DB_PORT="5432"
+            DB_USER=$PG_USER
+            export PGPASSWORD=$PG_PASSWORD
+            export KEYCLOAK_USER=keycloak
+            export KEYCLOAK_PASSWORD=$PG_PASSWORD
+            export KEYCLOAK_DATABASE=keycloak
+            psql -U $DB_USER -h $DB_HOST -tAc "CREATE USER $KEYCLOAK_USER WITH PASSWORD '$KEYCLOAK_PASSWORD';" || true
+            psql -U $DB_USER -h $DB_HOST -tAc "CREATE DATABASE $KEYCLOAK_DATABASE;" || true
+            psql -U $DB_USER -h $DB_HOST -tAc "GRANT ALL PRIVILEGES ON DATABASE $KEYCLOAK_DATABASE TO $KEYCLOAK_USER;" || true
+            psql -U $DB_USER -h $DB_HOST -tAc "GRANT ALL PRIVILEGES ON SCHEMA public TO $KEYCLOAK_USER;" || true
+            psql -U $DB_USER -h $DB_HOST -tAc "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $KEYCLOAK_USER;" || true
+            psql -U $DB_USER -h $DB_HOST -tAc "GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO $KEYCLOAK_USER;" || true
+            psql -U $DB_USER -h $DB_HOST -tAc "ALTER USER $KEYCLOAK_USER WITH SUPERUSER;" || true
+        env:
+        - name: PG_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.keycloak.externalDatabase.existingSecret }}
+              key: {{ .Values.keycloak.externalDatabase.existingSecretUserKey }}
+        - name: PG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.keycloak.externalDatabase.existingSecret }}
+              key: {{ .Values.keycloak.externalDatabase.existingSecretPasswordKey }}
+      restartPolicy: Never

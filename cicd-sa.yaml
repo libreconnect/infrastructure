@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cicd-service-account
+  namespace: kube-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cicd-role
+  namespace: ephemeral-libreconnect
+rules:
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["get", "list", "create", "delete", "update"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "namespaces", "secrets"]
+    verbs: ["create", "get", "list", "watch", "update", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["create", "get", "list", "watch", "update", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cicd-role-binding
+  namespace: ephemeral-libreconnect
+subjects:
+  - kind: ServiceAccount
+    name: cicd-service-account
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: cicd-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cicd-service-account-token
+  namespace: kube-system
+  annotations:
+    kubernetes.io/service-account.name: cicd-service-account
+type: kubernetes.io/service-account-token

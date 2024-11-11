@@ -1,0 +1,30 @@
+argo-cd:
+  dex:
+    enabled: true
+  notifications:
+    enabled: false
+  applicationSet:
+    enabled: false
+  server:
+    extraArgs:
+      - --insecure
+  configs:
+    # rbac:
+    #   policy.csv: |
+    #     g, libreconnect:argocd, role:admin
+
+    cm:
+      oidc.config: |
+        name: Keycloak
+        issuer: http://127.0.0.1/auth/realms/libreconnect
+        clientID: argocd
+        clientSecret: xBLQpaPjdFgBPvQl0tOOnO87LaSbZUHP
+      # oidc.config: |
+      #   # connectors:
+      #   #   - type: oidc
+      #   #     id: keycloak
+      #   #     name: Keycloak
+      #   #     config:
+      #   #       issuer: http://127.0.0.1/auth/realms/libreconnect
+      #   #       clientID: argocd
+      #   #       clientSecret: xBLQpaPjdFgBPvQl0tOOnO87LaSbZUHP
