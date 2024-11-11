@@ -14,6 +14,9 @@ spec:
           - environment: prod
             namespace: libreconnect
             valuesFile: environments/prod/values.yaml
+          - environment: staging
+            namespace: libreconnect
+            valuesFile: environments/staging/values.yaml
   template:
     metadata:
       name: '{{ environment }}-ferriscompany'
